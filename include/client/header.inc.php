@@ -59,9 +59,24 @@ if (($lang = Internationalization::getCurrentLanguage())
             <div class="pull-right flush-right">
             <p>
              <?php
+		// getting building
+		include("cdf-database.php");
+		//$sql = "SELECT value FROM ost_form_entry_values WHERE entry_id=11 AND field_id=38";
+		$sql = "SELECT ost_form_entry_values.value 
+		     FROM ost_form_entry_values
+		     INNER JOIN ost_form_entry
+		     WHERE ost_form_entry.id = ost_form_entry_values.entry_id
+		     AND ost_form_entry_values.field_id=38 AND ost_form_entry.object_id=".$thisclient->getId();
+		$results = $cfconn->query($sql);
+		while($row = mysqli_fetch_array($results)) {
+		$building = json_decode($row['value']."", true)['3'];
+		$building = substr($building, strpos($building, " "));
+		}
+		// end getting building, chop off the number at the beginning
+		
                 if ($thisclient && is_object($thisclient) && $thisclient->isValid()
                     && !$thisclient->isGuest()) {
-                 echo Format::htmlchars($thisclient->getName()).' - '.$thisclient->user_data('email').'&nbsp;|';
+                 echo Format::htmlchars($thisclient->getName()).' | '.$building.'&nbsp;|';
                  ?>
                 <a href="<?php echo ROOT_PATH; ?>profile.php"><?php echo __('Profile'); ?></a> |
                 <a href="<?php echo ROOT_PATH; ?>tickets.php"><?php echo sprintf(__('Tickets <b>(%d)</b>'), $thisclient->getNumTickets()); ?></a> -
