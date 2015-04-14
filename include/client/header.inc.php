@@ -60,17 +60,37 @@ if (($lang = Internationalization::getCurrentLanguage())
             <p>
              <?php
 		// getting building
+                if ($thisclient && is_object($thisclient) && $thisclient->isValid()){
 		include("cdf-database.php");
 		//$sql = "SELECT value FROM ost_form_entry_values WHERE entry_id=11 AND field_id=38";
-		$sql = "SELECT ost_form_entry_values.value 
+		$sql = "SELECT ost_form_entry_values.value
 		     FROM ost_form_entry_values
 		     INNER JOIN ost_form_entry
 		     WHERE ost_form_entry.id = ost_form_entry_values.entry_id
 		     AND ost_form_entry_values.field_id=38 AND ost_form_entry.object_id=".$thisclient->getId();
 		$results = $cfconn->query($sql);
 		while($row = mysqli_fetch_array($results)) {
-		$building = json_decode($row['value']."", true)['3'];
+		$building = reset(json_decode($row['value']."", true));
+		$building_number = substr($building, 0, 2);
 		$building = substr($building, strpos($building, " "));
+		}
+
+		//get building properties using building_number
+		$sql = "SELECT properties
+		     FROM ost_list_items
+		     WHERE value
+		     LIKE '".$building_number."%'";
+		$results = $cfconn->query($sql);
+		while($row = mysqli_fetch_array($results)) {
+		echo "<script>var bldgproperties = ".$row['properties'].";</script>";
+		$building_properties = json_decode($row['properties']."",true);
+		}
+		//end getting properties
+
+		//get names of properties
+		
+		//end get names of properties
+
 		}
 		// end getting building, chop off the number at the beginning
 		
