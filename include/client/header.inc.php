@@ -93,6 +93,7 @@ if (($lang = Internationalization::getCurrentLanguage())
 		$data = array();
 		while ($row = mysqli_fetch_array($results)){
 		$data = $row;
+		echo var_dump(json_encode($row['id'], $row['label']));
 		}
 		echo "<script>var propertynames = ".print_r($data['label']).";</script>";
 		//end get names of properties
