@@ -83,7 +83,7 @@ if (($lang = Internationalization::getCurrentLanguage())
 		     LIKE '".$building_number."%'";
 		$results = $cfconn->query($sql);
 		while($row = mysqli_fetch_array($results)) {
-		echo "<script>var bldgproperties = ".json_encode($row['properties']).";</script>";
+		echo "<script>var bldgproperties = JSON.parse(".json_encode($row['properties']).");</script>";
 		$building_properties = json_decode($row['properties']."",true);
 		}
 		//end getting properties
