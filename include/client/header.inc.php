@@ -72,7 +72,8 @@ if (($lang = Internationalization::getCurrentLanguage())
 		while($row = mysqli_fetch_array($results)) {
 		$building = reset(json_decode($row['value']."", true));
 		$building_number = substr($building, 0, 2);
-		$building = substr($building, strpos($building, " "));		
+		$building = substr($building, strpos($building, " ")+1);
+		echo "<script>var bldgname = '".$building."';</script>";
 		}
 		// end getting building, chop off the number at the beginning
 
@@ -93,7 +94,7 @@ if (($lang = Internationalization::getCurrentLanguage())
 		$results = $cfconn->query($sql);
 		$data = array();
 		while ($row = mysqli_fetch_array($results)){
-		$data[$row['id']] = $row['label'];
+		$data[$row['label']] = $row['id'];
 		}
 		echo "<script>var propertynames = ".json_encode($data).";</script>";
 		//end get names of properties
