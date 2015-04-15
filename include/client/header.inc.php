@@ -72,8 +72,9 @@ if (($lang = Internationalization::getCurrentLanguage())
 		while($row = mysqli_fetch_array($results)) {
 		$building = reset(json_decode($row['value']."", true));
 		$building_number = substr($building, 0, 2);
-		$building = substr($building, strpos($building, " "));
+		$building = substr($building, strpos($building, " "));		
 		}
+		// end getting building, chop off the number at the beginning
 
 		//get building properties using building_number
 		$sql = "SELECT properties
@@ -92,14 +93,12 @@ if (($lang = Internationalization::getCurrentLanguage())
 		$results = $cfconn->query($sql);
 		$data = array();
 		while ($row = mysqli_fetch_array($results)){
-		$data = $row;
-		echo var_dump(json_encode($row['id'], $row['label']));
+		$data[$row['id']] = $row['label'];
 		}
-		echo "<script>var propertynames = ".print_r($data['label']).";</script>";
+		echo "<script>var propertynames = ".json_encode($data).";</script>";
 		//end get names of properties
 
 		}
-		// end getting building, chop off the number at the beginning
 		
                 if ($thisclient && is_object($thisclient) && $thisclient->isValid()
                     && !$thisclient->isGuest()) {
