@@ -21,7 +21,7 @@ if($search) {
 }
 $showoverdue=$showanswered=false;
 $staffId=0; //Nothing for now...TODO: Allow admin and manager to limit tickets to single staff level.
-$showassigned= true; //show Assigned To column - defaults to true
+$showassigned= false; //show Assigned To column - defaults to true
 
 //Get status we are actually going to use on the query...making sure it is clean!
 $status=null;
@@ -403,7 +403,7 @@ if ($results) {
             } else { ?>
                 <th width="150">
                     <a <?php echo $dept_sort; ?> href="tickets.php?sort=dept&order=<?php echo $negorder;?><?php echo $qstr; ?>"
-                        title="<?php echo sprintf(__('Sort by %s %s'), __('Department'), __($negorder)); ?>"><?php echo __('Department');?></a></th>
+                        title="<?php echo sprintf(__('Sort by %s %s'), __('Building'), __($negorder)); ?>"><?php echo __('Building');?></a></th>
             <?php
             } ?>
         </tr>
