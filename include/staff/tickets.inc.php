@@ -85,7 +85,7 @@ switch ($queue_name) {
 case 'closed':
     $status='closed';
     $results_type=__('Closed Tickets');
-    $showassigned=true; //closed by.
+    $showassigned=false; //closed by.
     $queue_sort_options = array('closed', 'priority,due', 'due',
         'priority,updated', 'priority,created', 'answered', 'number', 'hot');
     break;

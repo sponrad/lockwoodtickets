@@ -1,3 +1,27 @@
+<script>
+$(document).ready( function(){
+  $("#topicId").change( function(){
+    $("#cautionarydiv").remove();
+    selectedprop = this.options[this.selectedIndex].innerHTML;
+    croppedprop = selectedprop.substr(3);
+    //console.log(propertynames[selectedprop]);
+    var covered = bldgproperties[ propertynames[selectedprop] ];
+    switch(covered){
+      case "yes":
+        $("#topicId").next().after("<p id='cautionarydiv'>Our records indicate the systems, equipment and facilities relating to "+croppedprop +" at "+bldgname+" fall under the landlord's responsibilities. Please submit a ticket.</p>");
+        break;
+      case "no":
+        $("#topicId").next().after("<p id='cautionarydiv'>Our records indicate the systems, equipment and facilities relating to "+croppedprop +" at "+bldgname+" are the sole responsibility of the tenant. If you feel this is in error, or there is a specific issue exceeding normal circumstances, we encourage you to submit a ticket.</p>");
+        break;
+      case "na":
+        $("#topicId").next().after("<p id='cautionarydiv'>Our records indicate there are no systems, equipment and facilities relating to "+croppedprop+" at "+bldgname+". If you feel this is in error, or there is a specific issue exceeding normal circumstances, we encourage you to submit a ticket.</p>");
+        break;
+      default:
+        $("#cautionarydiv").remove();
+    }
+  });
+});
+</script>
 <?php
 if(!defined('OSTCLIENTINC')) die('Access Denied!');
 $info=array();

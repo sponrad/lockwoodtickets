@@ -55,7 +55,7 @@ if ($cfg && $cfg->isClientRegistrationEnabled()) {
     </div>
 <?php } ?>
     <div>
-    <b><?php echo __("I'm an agent"); ?></b> —
+    <b><?php echo __("Independent contractor"); ?></b> —
     <a href="<?php echo ROOT_PATH; ?>scp/"><?php echo __('sign in here'); ?></a>
     </div>
     </div>

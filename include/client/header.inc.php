@@ -1,8 +1,8 @@
 <?php
 $title=($cfg && is_object($cfg) && $cfg->getTitle())
-    ? $cfg->getTitle() : 'osTicket :: '.__('Support Ticket System');
+     ? $cfg->getTitle() : 'osTicket :: '.__('Support Ticket System');
 $signin_url = ROOT_PATH . "login.php"
-    . ($thisclient ? "?e=".urlencode($thisclient->getEmail()) : "");
+            . ($thisclient ? "?e=".urlencode($thisclient->getEmail()) : "");
 $signout_url = ROOT_PATH . "logout.php?auth=".$ost->getLinkToken();
 
 header("Content-Type: text/html; charset=UTF-8");
@@ -14,28 +14,28 @@ if (($lang = Internationalization::getCurrentLanguage())) {
 ?>
 <!DOCTYPE html>
 <html<?php
-if ($lang
-        && ($info = Internationalization::getLanguageInfo($lang))
-        && (@$info['direction'] == 'rtl'))
-    echo ' dir="rtl" class="rtl"';
-if ($lang) {
-    echo ' lang="' . $lang . '"';
-}
-?>>
-<head>
+     if ($lang
+         && ($info = Internationalization::getLanguageInfo($lang))
+         && (@$info['direction'] == 'rtl'))
+     echo ' dir="rtl" class="rtl"';
+     if ($lang) {
+         echo ' lang="' . $lang . '"';
+     }
+     ?>>
+  <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title><?php echo Format::htmlchars($title); ?></title>
     <meta name="description" content="customer support platform">
     <meta name="keywords" content="osTicket, Customer support system, support ticket system">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/osticket.css?901e5ea" media="screen"/>
+    <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/osticket.css?901e5ea" media="screen"/>
     <link rel="stylesheet" href="<?php echo ASSETS_PATH; ?>css/theme.css?901e5ea" media="screen"/>
     <link rel="stylesheet" href="<?php echo ASSETS_PATH; ?>css/print.css?901e5ea" media="print"/>
     <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>scp/css/typeahead.css?901e5ea"
-         media="screen" />
+          media="screen" />
     <link type="text/css" href="<?php echo ROOT_PATH; ?>css/ui-lightness/jquery-ui-1.10.3.custom.min.css?901e5ea"
-        rel="stylesheet" media="screen" />
+          rel="stylesheet" media="screen" />
     <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/thread.css?901e5ea" media="screen"/>
     <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/redactor.css?901e5ea" media="screen"/>
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/font-awesome.min.css?901e5ea"/>
@@ -67,54 +67,94 @@ if ($lang) {
         parse_str($_SERVER['QUERY_STRING'], $qs);
         foreach ($langs as $L) {
             $qs['lang'] = $L; ?>
-        <link rel="alternate" href="//<?php echo $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>?<?php
-            echo http_build_query($qs); ?>" hreflang="<?php echo $L; ?>" />
+      <link rel="alternate" href="//<?php echo $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>?<?php
+                                                                                                   echo http_build_query($qs); ?>" hreflang="<?php echo $L; ?>" />
+    <?php
+    } ?>
+    <link rel="alternate" href="//<?php echo $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>"
+          hreflang="x-default" />
 <?php
-        } ?>
-        <link rel="alternate" href="//<?php echo $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>"
-            hreflang="x-default" />
-<?php
-    }
-    ?>
-</head>
-<body>
+}
+?>
+  </head>
+  <body>
     <div id="container">
-        <div id="header">
-            <div class="pull-right flush-right">
-            <p>
-             <?php
-                if ($thisclient && is_object($thisclient) && $thisclient->isValid()
-                    && !$thisclient->isGuest()) {
-                 echo Format::htmlchars($thisclient->getName()).'&nbsp;|';
-                 ?>
-                <a href="<?php echo ROOT_PATH; ?>profile.php"><?php echo __('Profile'); ?></a> |
-                <a href="<?php echo ROOT_PATH; ?>tickets.php"><?php echo sprintf(__('Tickets <b>(%d)</b>'), $thisclient->getNumTickets()); ?></a> -
-                <a href="<?php echo $signout_url; ?>"><?php echo __('Sign Out'); ?></a>
+      <div id="header">
+        <div class="pull-right flush-right">
+          <p>
+            <?php
+            // getting building
+            if ($thisclient && is_object($thisclient) && $thisclient->isValid()){
+                include("cdf-database.php");
+                //$sql = "SELECT value FROM ost_form_entry_values WHERE entry_id=11 AND field_id=38";
+                $sql = "SELECT ost_form_entry_values.value
+		     FROM ost_form_entry_values
+		     INNER JOIN ost_form_entry
+		     WHERE ost_form_entry.id = ost_form_entry_values.entry_id
+		     AND ost_form_entry_values.field_id=38 AND ost_form_entry.object_id=".$thisclient->getId();
+                $results = $cfconn->query($sql);
+                while($row = mysqli_fetch_array($results)) {
+            	    $building = reset(json_decode($row['value']."", true));
+                    $building_number = substr($building, 0, 2);
+                    $building = substr($building, strpos($building, " ")+1);
+                    echo "<script>var bldgname = '".$building."';</script>";
+                }
+                // end getting building, chop off the number at the beginning
+
+                //get building properties using building_number
+                $sql = "SELECT properties
+		     FROM ost_list_items
+		     WHERE value
+		     LIKE '".$building_number."%'";
+                $results = $cfconn->query($sql);
+                while($row = mysqli_fetch_array($results)) {
+            	    echo "<script>var bldgproperties = JSON.parse(".json_encode($row['properties']).");</script>";
+                    $building_properties = json_decode($row['properties']."",true);
+                }
+                //end getting properties
+                //get names of properties
+                $sql = "SELECT id, label FROM ost_form_field WHERE form_id=6";
+                $results = $cfconn->query($sql);
+                $data = array();
+                while ($row = mysqli_fetch_array($results)){
+            	    $data[$row['label']] = $row['id'];
+                }
+                echo "<script>var propertynames = ".json_encode($data).";</script>";
+                //end get names of properties
+            }
+
+            if ($thisclient && is_object($thisclient) && $thisclient->isValid()
+                && !$thisclient->isGuest()) {
+                echo Format::htmlchars($thisclient->getName()).' | '.$building.'&nbsp;|';
+            ?>
+              <a href="<?php echo ROOT_PATH; ?>profile.php"><?php echo __('Profile'); ?></a> |
+              <a href="<?php echo ROOT_PATH; ?>tickets.php"><?php echo sprintf(__('Tickets <b>(%d)</b>'), $thisclient->getNumTickets()); ?></a> -
+              <a href="<?php echo $signout_url; ?>"><?php echo __('Sign Out'); ?></a>
             <?php
             } elseif($nav) {
                 if ($cfg->getClientRegistrationMode() == 'public') { ?>
-                    <?php echo __('Guest User'); ?> | <?php
-                }
-                if ($thisclient && $thisclient->isValid() && $thisclient->isGuest()) { ?>
-                    <a href="<?php echo $signout_url; ?>"><?php echo __('Sign Out'); ?></a><?php
-                }
-                elseif ($cfg->getClientRegistrationMode() != 'disabled') { ?>
-                    <a href="<?php echo $signin_url; ?>"><?php echo __('Sign In'); ?></a>
-<?php
-                }
+                <?php echo __('Guest User'); ?> | <?php
+                                                  }
+                                                  if ($thisclient && $thisclient->isValid() && $thisclient->isGuest()) { ?>
+                <a href="<?php echo $signout_url; ?>"><?php echo __('Sign Out'); ?></a><?php
+                                                                                       }
+                                                                                       elseif ($cfg->getClientRegistrationMode() != 'disabled') { ?>
+                  <a href="<?php echo $signin_url; ?>"><?php echo __('Sign In'); ?></a>
+            <?php
+            }
             } ?>
-            </p>
-            <p>
-<?php
-if (($all_langs = Internationalization::getConfiguredSystemLanguages())
-    && (count($all_langs) > 1)
-) {
-    $qs = array();
-    parse_str($_SERVER['QUERY_STRING'], $qs);
-    foreach ($all_langs as $code=>$info) {
-        list($lang, $locale) = explode('_', $code);
-        $qs['lang'] = $code;
-?>
+          </p>
+          <p>
+            <?php
+            if (($all_langs = Internationalization::getConfiguredSystemLanguages())
+                && (count($all_langs) > 1)
+            ) {
+                $qs = array();
+                parse_str($_SERVER['QUERY_STRING'], $qs);
+                foreach ($all_langs as $code=>$info) {
+                    list($lang, $locale) = explode('_', $code);
+                    $qs['lang'] = $code;
+            ?>
         <a class="flag flag-<?php echo strtolower($locale ?: $info['flag'] ?: $lang); ?>"
             href="?<?php echo http_build_query($qs);
             ?>" title="<?php echo Internationalization::getLanguageDescription($code); ?>">&nbsp;</a>
