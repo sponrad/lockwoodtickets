@@ -5,14 +5,22 @@ $signin_url = ROOT_PATH . "login.php"
     . ($thisclient ? "?e=".urlencode($thisclient->getEmail()) : "");
 $signout_url = ROOT_PATH . "logout.php?auth=".$ost->getLinkToken();
 
-header("Content-Type: text/html; charset=UTF-8\r\n");
+header("Content-Type: text/html; charset=UTF-8");
+if (($lang = Internationalization::getCurrentLanguage())) {
+    $langs = array_unique(array($lang, $cfg->getPrimaryLanguage()));
+    $langs = Internationalization::rfc1766($langs);
+    header("Content-Language: ".implode(', ', $langs));
+}
 ?>
 <!DOCTYPE html>
-<html <?php
-if (($lang = Internationalization::getCurrentLanguage())
+<html<?php
+if ($lang
         && ($info = Internationalization::getLanguageInfo($lang))
         && (@$info['direction'] == 'rtl'))
-    echo 'dir="rtl" class="rtl"';
+    echo ' dir="rtl" class="rtl"';
+if ($lang) {
+    echo ' lang="' . $lang . '"';
+}
 ?>>
 <head>
     <meta charset="utf-8">
@@ -20,90 +28,64 @@ if (($lang = Internationalization::getCurrentLanguage())
     <title><?php echo Format::htmlchars($title); ?></title>
     <meta name="description" content="customer support platform">
     <meta name="keywords" content="osTicket, Customer support system, support ticket system">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	<link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/osticket.css?ecb4f89" media="screen">
-    <link rel="stylesheet" href="<?php echo ASSETS_PATH; ?>css/theme.css?ecb4f89" media="screen">
-    <link rel="stylesheet" href="<?php echo ASSETS_PATH; ?>css/print.css?ecb4f89" media="print">
-    <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>scp/css/typeahead.css"
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/osticket.css?901e5ea" media="screen"/>
+    <link rel="stylesheet" href="<?php echo ASSETS_PATH; ?>css/theme.css?901e5ea" media="screen"/>
+    <link rel="stylesheet" href="<?php echo ASSETS_PATH; ?>css/print.css?901e5ea" media="print"/>
+    <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>scp/css/typeahead.css?901e5ea"
          media="screen" />
-    <link type="text/css" href="<?php echo ROOT_PATH; ?>css/ui-lightness/jquery-ui-1.10.3.custom.min.css"
+    <link type="text/css" href="<?php echo ROOT_PATH; ?>css/ui-lightness/jquery-ui-1.10.3.custom.min.css?901e5ea"
         rel="stylesheet" media="screen" />
-    <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/thread.css?ecb4f89" media="screen">
-    <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/redactor.css?ecb4f89" media="screen">
-    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/font-awesome.min.css?ecb4f89">
-    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/flags.css?ecb4f89">
-    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/rtl.css?ecb4f89"/>
-    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/jquery-1.8.3.min.js?ecb4f89"></script>
-    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/jquery-ui-1.10.3.custom.min.js?ecb4f89"></script>
-    <script src="<?php echo ROOT_PATH; ?>js/osticket.js?ecb4f89"></script>
-    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/filedrop.field.js?ecb4f89"></script>
-    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/jquery.multiselect.min.js?ecb4f89"></script>
-    <script src="<?php echo ROOT_PATH; ?>scp/js/bootstrap-typeahead.js?ecb4f89"></script>
-    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor.min.js?ecb4f89"></script>
-    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor-osticket.js?ecb4f89"></script>
-    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor-fonts.js?ecb4f89"></script>
+    <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/thread.css?901e5ea" media="screen"/>
+    <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/redactor.css?901e5ea" media="screen"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/font-awesome.min.css?901e5ea"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/flags.css?901e5ea"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/rtl.css?901e5ea"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/select2.min.css?901e5ea"/>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/jquery-1.11.2.min.js?901e5ea"></script>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/jquery-ui-1.10.3.custom.min.js?901e5ea"></script>
+    <script src="<?php echo ROOT_PATH; ?>js/osticket.js?901e5ea"></script>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/filedrop.field.js?901e5ea"></script>
+    <script src="<?php echo ROOT_PATH; ?>scp/js/bootstrap-typeahead.js?901e5ea"></script>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor.min.js?901e5ea"></script>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor-plugins.js?901e5ea"></script>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor-osticket.js?901e5ea"></script>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/select2.min.js?901e5ea"></script>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/fabric.min.js?901e5ea"></script>
     <?php
     if($ost && ($headers=$ost->getExtraHeaders())) {
         echo "\n\t".implode("\n\t", $headers)."\n";
+    }
+
+    // Offer alternate links for search engines
+    // @see https://support.google.com/webmasters/answer/189077?hl=en
+    if (($all_langs = Internationalization::getConfiguredSystemLanguages())
+        && (count($all_langs) > 1)
+    ) {
+        $langs = Internationalization::rfc1766(array_keys($all_langs));
+        $qs = array();
+        parse_str($_SERVER['QUERY_STRING'], $qs);
+        foreach ($langs as $L) {
+            $qs['lang'] = $L; ?>
+        <link rel="alternate" href="//<?php echo $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>?<?php
+            echo http_build_query($qs); ?>" hreflang="<?php echo $L; ?>" />
+<?php
+        } ?>
+        <link rel="alternate" href="//<?php echo $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>"
+            hreflang="x-default" />
+<?php
     }
     ?>
 </head>
 <body>
     <div id="container">
         <div id="header">
-            <a class="pull-left" id="logo" href="<?php echo ROOT_PATH; ?>index.php"
-            title="<?php echo __('Support Center'); ?>"><img src="<?php
-                echo ROOT_PATH; ?>logo.php" border=0 alt="<?php
-                echo $ost->getConfig()->getTitle(); ?>"
-                style="height: 5em"></a>
             <div class="pull-right flush-right">
             <p>
              <?php
-		// getting building
-                if ($thisclient && is_object($thisclient) && $thisclient->isValid()){
-		include("cdf-database.php");
-		//$sql = "SELECT value FROM ost_form_entry_values WHERE entry_id=11 AND field_id=38";
-		$sql = "SELECT ost_form_entry_values.value
-		     FROM ost_form_entry_values
-		     INNER JOIN ost_form_entry
-		     WHERE ost_form_entry.id = ost_form_entry_values.entry_id
-		     AND ost_form_entry_values.field_id=38 AND ost_form_entry.object_id=".$thisclient->getId();
-		$results = $cfconn->query($sql);
-		while($row = mysqli_fetch_array($results)) {
-		$building = reset(json_decode($row['value']."", true));
-		$building_number = substr($building, 0, 2);
-		$building = substr($building, strpos($building, " ")+1);
-		echo "<script>var bldgname = '".$building."';</script>";
-		}
-		// end getting building, chop off the number at the beginning
-
-		//get building properties using building_number
-		$sql = "SELECT properties
-		     FROM ost_list_items
-		     WHERE value
-		     LIKE '".$building_number."%'";
-		$results = $cfconn->query($sql);
-		while($row = mysqli_fetch_array($results)) {
-		echo "<script>var bldgproperties = JSON.parse(".json_encode($row['properties']).");</script>";
-		$building_properties = json_decode($row['properties']."",true);
-		}
-		//end getting properties
-
-		//get names of properties
-		$sql = "SELECT id, label FROM ost_form_field WHERE form_id=6";
-		$results = $cfconn->query($sql);
-		$data = array();
-		while ($row = mysqli_fetch_array($results)){
-		$data[$row['label']] = $row['id'];
-		}
-		echo "<script>var propertynames = ".json_encode($data).";</script>";
-		//end get names of properties
-
-		}
-		
                 if ($thisclient && is_object($thisclient) && $thisclient->isValid()
                     && !$thisclient->isGuest()) {
-                 echo Format::htmlchars($thisclient->getName()).' | '.$building.'&nbsp;|';
+                 echo Format::htmlchars($thisclient->getName()).'&nbsp;|';
                  ?>
                 <a href="<?php echo ROOT_PATH; ?>profile.php"><?php echo __('Profile'); ?></a> |
                 <a href="<?php echo ROOT_PATH; ?>tickets.php"><?php echo sprintf(__('Tickets <b>(%d)</b>'), $thisclient->getNumTickets()); ?></a> -
@@ -124,19 +106,28 @@ if (($lang = Internationalization::getCurrentLanguage())
             </p>
             <p>
 <?php
-if (($all_langs = Internationalization::availableLanguages())
+if (($all_langs = Internationalization::getConfiguredSystemLanguages())
     && (count($all_langs) > 1)
 ) {
+    $qs = array();
+    parse_str($_SERVER['QUERY_STRING'], $qs);
     foreach ($all_langs as $code=>$info) {
         list($lang, $locale) = explode('_', $code);
+        $qs['lang'] = $code;
 ?>
         <a class="flag flag-<?php echo strtolower($locale ?: $info['flag'] ?: $lang); ?>"
-            href="?<?php echo urlencode($_GET['QUERY_STRING']); ?>&amp;lang=<?php echo $code;
+            href="?<?php echo http_build_query($qs);
             ?>" title="<?php echo Internationalization::getLanguageDescription($code); ?>">&nbsp;</a>
 <?php }
 } ?>
             </p>
             </div>
+            <a class="pull-left" id="logo" href="<?php echo ROOT_PATH; ?>index.php"
+            title="<?php echo __('Support Center'); ?>">
+                <span class="valign-helper"></span>
+                <img src="<?php echo ROOT_PATH; ?>logo.php" border=0 alt="<?php
+                echo $ost->getConfig()->getTitle(); ?>">
+            </a>
         </div>
         <div class="clear"></div>
         <?php
